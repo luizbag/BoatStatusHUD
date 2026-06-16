@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx" HintPath="lib\BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="lib\0Harmony.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="lib\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="lib\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="lib\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="lib\UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.PhysicsModule" HintPath="lib\UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath=">lib\UnityEngine.TextRenderingModule.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
