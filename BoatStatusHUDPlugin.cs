@@ -19,9 +19,19 @@ namespace BoatStatusHUD
         {
             try
             {
+                /* Single source of truth for all ship profiles inside the main BepInEx .cfg */
+                var shipProfilesConfig = Config.Bind("ShipProfiles", "Profiles",
+                    "Kakam=400;Cog=700;Dhow=800;Junk=4000;Sanbuq=6000;Brig=10000;Jong=17000;" +
+                    "Gallus=400;Caelanor=2000;Clipper=10000;Gloriana=12000;Chronian=17000;Leopard=20000;" +
+                    "Shroud Small=600;Shroud Large=9000;BOAT CUTTER=250;DNG=150",
+                    "List of ship profiles and their max carrying capacities (Format: Key=Capacity;)");
+
+                Utils.ParseProfilesString(shipProfilesConfig.Value);
+
                 _panels = new List<HUDPanel>
                 {
-                    new InstrumentsPanel()
+                    new InstrumentsPanel(),
+                    new CargoPanel(),
                 };
 
                 Info.Metadata.GetType().GetProperty("Version")?.SetValue(Info.Metadata, new System.Version(PluginInfo.Version));
@@ -50,20 +60,23 @@ namespace BoatStatusHUD
 
             BoatDamage activeBoat = GameState.lastBoat.GetComponent<BoatDamage>();
 
-            Rect hudRect = new Rect(20, 20, 310, 500);
+            GUILayout.BeginArea(new Rect(20, 20, 320, Screen.height));
 
-            GUIStyle panelStyle = new GUIStyle(GUI.skin.box);
-            panelStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.70f));
-            panelStyle.border = new RectOffset(4, 4, 4, 4);
+            GUIStyle mainContainerStyle = new GUIStyle(GUI.skin.box);
+            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.80f));
+            mainContainerStyle.padding = new RectOffset(10, 10, 10, 10);
 
-            GUI.Box(hudRect, "", panelStyle);
+            mainContainerStyle.stretchWidth = false;
+            mainContainerStyle.stretchHeight = false;
 
-            GUILayout.BeginArea(new Rect(hudRect.x + 12, hudRect.y + 12, hudRect.width - 24, hudRect.height - 24));
+            GUILayout.BeginVertical(mainContainerStyle);
 
             GUIStyle baseStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12,
-                richText = true
+                richText = true,
+                wordWrap = false,
+                clipping = TextClipping.Overflow
             };
 
             foreach (var panel in _panels)
@@ -71,6 +84,7 @@ namespace BoatStatusHUD
                 panel.DrawLines(baseStyle, activeBoat);
             }
 
+            GUILayout.EndVertical();
             GUILayout.EndArea();
         }
 

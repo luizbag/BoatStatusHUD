@@ -8,12 +8,11 @@ namespace BoatStatusHUD
     {
         private ConfigEntry<bool> _requireChipLog;
         private ConfigEntry<bool> _requireCompass;
-        private ConfigEntry<bool> _requireWindIndicator;
 
         private bool _hasChipLog = false;
         private bool _hasCompass = false;
-        private bool _hasWindIndicator = false;
         private float _nextCheckTime = 0f;
+        private bool _first = true;
 
         public override void BindConfig(ConfigFile config)
         {
@@ -21,20 +20,19 @@ namespace BoatStatusHUD
 
             _requireChipLog = config.Bind("EquipmentRequirements", "RequireChipLogForSpeed", true, "Speed appears only with a chip log aboard.");
             _requireCompass = config.Bind("EquipmentRequirements", "RequireCompassForHeading", true, "Heading appears only with a compass aboard.");
-            _requireWindIndicator = config.Bind("EquipmentRequirements", "RequireWindIndicatorForWind", true, "Wind appears only with a windicator on the ship.");
         }
 
         public override void UpdateTelemetry(BoatDamage currentBoat)
         {
             if (!IsEnabled.Value || currentBoat == null) return;
 
-            if (Time.time >= _nextCheckTime)
+            if (Time.time >= _nextCheckTime || _first)
             {
+                _first = false;
                 _nextCheckTime = Time.time + 1f;
 
                 _hasChipLog = !_requireChipLog.Value;
                 _hasCompass = !_requireCompass.Value;
-                _hasWindIndicator = !_requireWindIndicator.Value;
 
                 Transform[] boatObjects = currentBoat.GetComponentsInChildren<Transform>(true);
                 CheckTransforms(boatObjects);
@@ -66,11 +64,6 @@ namespace BoatStatusHUD
                 {
                     _hasChipLog = true;
                 }
-
-                if (_requireWindIndicator.Value && (nameLower.Contains("windicator") || nameLower.Contains("tell tale") || nameLower.Contains("tell_tale")))
-                {
-                    _hasWindIndicator = true;
-                }
             }
         }
 
@@ -81,16 +74,16 @@ namespace BoatStatusHUD
             Rigidbody boatRigidbody = currentBoat.GetComponent<Rigidbody>();
             if (boatRigidbody == null) return;
 
-            GUIStyle cardStyle = new GUIStyle(GUI.skin.box);
-            cardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
-            cardStyle.margin = new RectOffset(0, 0, 0, 10);
-            cardStyle.padding = new RectOffset(10, 10, 10, 10);
+            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
+            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
+            subCardStyle.margin = new RectOffset(0, 0, 0, 8);
+            subCardStyle.padding = new RectOffset(12, 12, 12, 12);
+            subCardStyle.stretchWidth = false;
+            subCardStyle.stretchHeight = false;
 
-            GUIStyle labelStyle = new GUIStyle(defaultStyle);
+            GUILayout.BeginVertical(subCardStyle);
 
-            GUILayout.BeginVertical(cardStyle);
-
-            // 1. Vessel Speed
+            // 1. Vessel Speed (Frame-to-Frame)
             if (_hasChipLog)
             {
                 Vector3 rawVelocity = boatRigidbody.velocity;
@@ -98,41 +91,43 @@ namespace BoatStatusHUD
                 float speedInKnots = forwardSpeed * 1.94384f;
                 if (Mathf.Abs(speedInKnots) < 0.1f) speedInKnots = 0f;
 
-                DrawHUDLine($"<color={ColorLabel}>Vessel Speed: </color> <b>{speedInKnots:F1} kts</b>", labelStyle);
+                DrawHUDLine($"<color={ColorLabel}>Speed: <b>{speedInKnots:F1} kts</b></color>", defaultStyle);
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Vessel Speed: [Requires Chip Log]</color>", labelStyle);
+                DrawHUDLine($"<color={ColorMuted}>Speed: [Requires Chip Log]</color>", defaultStyle);
             }
 
-            // 2. Heading
+            // 2. Heading (Frame-to-Frame)
             if (_hasCompass)
             {
                 float headingDegrees = currentBoat.transform.eulerAngles.y;
                 if (headingDegrees < 0) headingDegrees += 360f;
 
-                DrawHUDLine($"<color={ColorLabel}>Heading: </color> <b>{headingDegrees:F0}°</b>", labelStyle);
+                DrawHUDLine($"<color={ColorLabel}>Heading: <b>{headingDegrees:F0}°</b></color>", defaultStyle);
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Heading: [Requires Compass]</color>", labelStyle);
+                DrawHUDLine($"<color={ColorMuted}>Heading: [Requires Compass]</color>", defaultStyle);
             }
 
-            // 3. Wind Speed
-            if (_hasWindIndicator)
-            {
-                float windSpeedInKnots = Wind.currentWind.magnitude * 1.94384f;
-                DrawHUDLine($"<color={ColorLabel}>Wind Speed: </color> <b>{windSpeedInKnots:F1} kts</b>", labelStyle);
-            }
-            else
-            {
-                DrawHUDLine($"<color={ColorMuted}>Wind Speed: [No Wind Indicator]</color>", labelStyle);
-            }
-
-            // 4. Heel Angle
             float heelAngle = Vector3.Angle(currentBoat.transform.up, Vector3.up);
+
+            float localZ = currentBoat.transform.localEulerAngles.z;
+            if (localZ > 180f) localZ -= 360f;
+
+            string sideIndicator = "";
+            if (heelAngle > 0.5f)
+            {
+                // Se Z for positivo, o barco está inclinado para Bombordo (Port)
+                // Se Z for negativo, o barco está inclinado para Estibordo (Starboard)
+                sideIndicator = localZ > 0f ? "P" : "S";
+            }
+
+            // Se passar do limite de segurança do barco, o texto fica vermelho
             string colorHeel = (heelAngle > currentBoat.safeAngleLimit) ? ColorDanger : ColorLabel;
-            DrawHUDLine($"<color={colorHeel}>Heel Angle: {heelAngle:F1}° / {currentBoat.safeAngleLimit:F0}°</color>", labelStyle);
+
+            DrawHUDLine($"<color={ColorLabel}>Heel Angle:</color> <color={colorHeel}><b>{heelAngle:F1}°{sideIndicator}</b> / {currentBoat.safeAngleLimit:F0}°</color>", defaultStyle);
 
             GUILayout.EndVertical();
         }

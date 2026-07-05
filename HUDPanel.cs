@@ -7,11 +7,11 @@ namespace BoatStatusHUD
     {
         protected ConfigEntry<bool> IsEnabled;
 
-        protected readonly Color BackgroundColor = new Color(0.29f, 0.35f, 0.41f, 0.80f);
+        protected readonly Color BackgroundColor = new Color(0.047f, 0.035f, 0.020f, 0.34f);
 
-        protected readonly string ColorLabel = "#bd7f2e";
+        protected readonly string ColorLabel = "#F5EEDCE0";
 
-        protected readonly string ColorMuted = "#515964";
+        protected readonly string ColorMuted = "#A19B8EE0";
 
         protected readonly string ColorDanger = "#ff3333";
 
