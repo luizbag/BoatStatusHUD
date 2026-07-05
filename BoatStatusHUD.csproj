@@ -2,7 +2,41 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
+    <AssemblyName>BoatStatusHUD</AssemblyName>
+    <Version>1.1.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>PluginGUID</_Parameter1>
+      <_Parameter2>com.luizbag.sailwind.boatstatushud</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>PluginName</_Parameter1>
+      <_Parameter2>BoatStatusHUD</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
+  <Target Name="UpdateManifestJson" AfterTargets="Build">
+    <PropertyGroup>
+      <ManifestPath>$(ProjectDir)manifest.json</ManifestPath>
+      <ManifestContent><![CDATA[{
+    "name": "BoatStatusHUD",
+    "version_number": "$(Version)",
+    "website_url": "",
+    "description": "Real-time vessel telemetry and instrumentation overlay for Sailwind.",
+    "dependencies": [
+        "bbepis-BepInExPack-5.4.2100"
+    ]
+}]]></ManifestContent>
+    </PropertyGroup>
+    
+    <Message Importance="High" Text="[Auto-Version] Writing synchronized manifest.json (v$(Version))..." />
+    <WriteLinesToFile File="$(ManifestPath)" Lines="$(ManifestContent)" Overwrite="true" />
+  </Target>
+
   <ItemGroup>
     <Reference Include="BepInEx" HintPath="lib\BepInEx.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="lib\0Harmony.dll" Private="false" />

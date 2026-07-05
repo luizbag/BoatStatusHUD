@@ -1,26 +1,44 @@
-﻿using BepInEx;
+﻿using System.Linq;
+using System.Reflection;
+using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
 namespace BoatStatusHUD
 {
-    [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
+    [BepInPlugin("com.luizbag.sailwind.boatstatushud", "BoatStatusHUD", "0.0.0")]
     public class BoatStatusHUDPlugin : BaseUnityPlugin
     {
         public static class PluginInfo
         {
-            public const string GUID = "com.luizbag.sailwind.boatstatushud";
-            public const string Name = "BoatStatusHUD";
-            public const string Version = "1.0.0";
+            public static readonly string GUID = ((AssemblyMetadataAttribute)System.Attribute
+                .GetCustomAttributes(typeof(BoatStatusHUDPlugin).Assembly, typeof(AssemblyMetadataAttribute))
+                .FirstOrDefault(x => ((AssemblyMetadataAttribute)x).Key == "PluginGUID"))?.Value ?? "com.luizbag.sailwind.boatstatushud";
+
+            public static readonly string Name = ((AssemblyMetadataAttribute)System.Attribute
+                .GetCustomAttributes(typeof(BoatStatusHUDPlugin).Assembly, typeof(AssemblyMetadataAttribute))
+                .FirstOrDefault(x => ((AssemblyMetadataAttribute)x).Key == "PluginName"))?.Value ?? "BoatStatusHUD";
+
+            public static readonly string Version = typeof(BoatStatusHUDPlugin).Assembly
+                .GetName().Version.ToString(3);
         }
 
         // Global static tracking of the active vessel's core damage script
         public static BoatDamage CurrentBoatDamage;
+        private ConfigEntry<bool> _hudVisible;
+        private ConfigEntry<KeyCode> _hudToggleKey;
 
         private void Awake()
         {
             try
             {
+                Info.Metadata.GetType().GetProperty("Version")?.SetValue(Info.Metadata, new System.Version(PluginInfo.Version));
+                
+                _hudVisible = Config.Bind("HUDSections", "HudVisible", true, "Master switch for the whole overlay.");
+
+                _hudToggleKey = Config.Bind("HUDSections", "HudToggleKey", KeyCode.F8, "The key that flips the HUD visibility at sea.");
+
                 var harmony = new Harmony(PluginInfo.GUID);
                 harmony.PatchAll();
                 Logger.LogInfo($"[{PluginInfo.Name}] Telemetry system successfully initialized.");
@@ -33,6 +51,7 @@ namespace BoatStatusHUD
 
         private void OnGUI()
         {
+            if (!_hudVisible.Value) return;
             if (!GameState.playing || GameState.justStarted || GameState.lastBoat == null)
             {
                 return;
@@ -86,16 +105,16 @@ namespace BoatStatusHUD
             defaultStyle.normal.textColor = Color.white;
 
             // Métodos de estilo granular
-            GUIStyle GetStyleForAngle(float angle, float limit) => 
+            GUIStyle GetStyleForAngle(float angle, float limit) =>
                 new GUIStyle(defaultStyle) { normal = { textColor = (angle > limit) ? Color.yellow : Color.white } };
 
-            GUIStyle GetStyleForDamage(float damage) => 
+            GUIStyle GetStyleForDamage(float damage) =>
                 new GUIStyle(defaultStyle) { normal = { textColor = (damage >= 95f) ? Color.red : (damage > 15f) ? Color.yellow : Color.white } };
 
-            GUIStyle GetStyleForWater(float water, bool sunk) => 
+            GUIStyle GetStyleForWater(float water, bool sunk) =>
                 new GUIStyle(defaultStyle) { normal = { textColor = sunk ? Color.red : (water > 15f) ? Color.yellow : Color.white } };
 
-            GUIStyle GetStyleForClearance(float clearance) => 
+            GUIStyle GetStyleForClearance(float clearance) =>
                 new GUIStyle(defaultStyle) { normal = { textColor = (clearance <= 0.1f) ? Color.red : (clearance < 2.0f) ? Color.yellow : Color.white } };
 
             // Renderizador linha por linha
@@ -114,7 +133,7 @@ namespace BoatStatusHUD
             DrawHUDLine("[ VESSEL INSTRUMENTS ]", defaultStyle);
             DrawHUDLine("---------------------------", defaultStyle);
             DrawHUDLine($"Vessel Speed   : {speedInKnots:F1} kts", defaultStyle);
-            DrawHUDLine($"Wind Speed     : {windSpeedInKnots:F1} kts", defaultStyle); 
+            DrawHUDLine($"Wind Speed     : {windSpeedInKnots:F1} kts", defaultStyle);
             DrawHUDLine($"Heel Angle     : {heelAngle:F1}° / {activeBoatDamage.safeAngleLimit:F0}°", GetStyleForAngle(heelAngle, activeBoatDamage.safeAngleLimit));
             DrawHUDLine($"Cargo Weight   : {cargoWeightInPounds:F0} lbs", defaultStyle);
             DrawHUDLine("---------------------------", defaultStyle);
@@ -133,6 +152,23 @@ namespace BoatStatusHUD
             // Bloco 4: Integridade Estrutural (Avisos Individuais)
             DrawHUDLine($"Hull Integrity : {(100f - currentHullDamage):F1}%", GetStyleForDamage(currentHullDamage));
             DrawHUDLine($"Bilge Water    : {currentBilgeWater:F1}%", GetStyleForWater(currentBilgeWater, activeBoatDamage.sunk));
+        }
+
+        private void Update()
+        {
+            // Impede que o botão funcione nos menus iniciais do jogo
+            if (!GameState.playing || GameState.justStarted) return;
+
+            // Deteta o clique único na tecla F8 configurada
+            if (Input.GetKeyDown(_hudToggleKey.Value))
+            {
+                _hudVisible.Value = !_hudVisible.Value;
+
+                // Grava a preferência no ficheiro .cfg automaticamente
+                Config.Save();
+
+                Logger.LogInfo($"[{PluginInfo.Name}] HUD visibility changed to: {_hudVisible.Value}");
+            }
         }
     }
 }

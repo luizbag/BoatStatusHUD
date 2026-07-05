@@ -1,8 +1,8 @@
 {
     "name": "BoatStatusHUD",
-    "version_number": "1.0.0",
-    "website_url": "https://github.com/luizbag/BoatStatusHUD",
-    "description": "A real-time vessel telemetry HUD overlay displaying hull damage, integrity, bilge water level, and oakum condition.",
+    "version_number": "1.1.0",
+    "website_url": "",
+    "description": "Real-time vessel telemetry and instrumentation overlay for Sailwind.",
     "dependencies": [
         "bbepis-BepInExPack-5.4.2100"
     ]
