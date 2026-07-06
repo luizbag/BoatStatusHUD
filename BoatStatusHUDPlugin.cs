@@ -33,6 +33,7 @@ namespace BoatStatusHUD
                     new InstrumentsPanel(),
                     new CargoPanel(),
                     new SoundingPanel(),
+                    new StatusPanel(),
                 };
 
                 Info.Metadata.GetType().GetProperty("Version")?.SetValue(Info.Metadata, new System.Version(PluginInfo.Version));
