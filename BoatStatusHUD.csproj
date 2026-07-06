@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>BoatStatusHUD</AssemblyName>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -35,6 +35,14 @@
     
     <Message Importance="High" Text="[Auto-Version] Writing synchronized manifest.json (v$(Version))..." />
     <WriteLinesToFile File="$(ManifestPath)" Lines="$(ManifestContent)" Overwrite="true" />
+  </Target>
+
+  <Target Name="CopyToPluginFolder" AfterTargets="UpdateManifestJson">
+    <PropertyGroup>
+      <PluginDir>C:\Users\luizb\AppData\Roaming\Thunderstore Mod Manager\DataFolder\Sailwind\profiles\Default\BepInEx\plugins\Bags-BoatStatusHUD</PluginDir>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginDir)" />
+    <Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFolder="$(PluginDir)" Condition="Exists('$(ProjectDir)manifest.json')" />
   </Target>
 
   <ItemGroup>

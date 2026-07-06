@@ -32,6 +32,7 @@ namespace BoatStatusHUD
                 {
                     new InstrumentsPanel(),
                     new CargoPanel(),
+                    new SoundingPanel(),
                 };
 
                 Info.Metadata.GetType().GetProperty("Version")?.SetValue(Info.Metadata, new System.Version(PluginInfo.Version));
@@ -60,7 +61,7 @@ namespace BoatStatusHUD
 
             BoatDamage activeBoat = GameState.lastBoat.GetComponent<BoatDamage>();
 
-            GUILayout.BeginArea(new Rect(20, 20, 320, Screen.height));
+            GUILayout.BeginArea(new Rect(20, 20, 200, Screen.height));
 
             GUIStyle mainContainerStyle = new GUIStyle(GUI.skin.box);
             mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.80f));
