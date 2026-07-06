@@ -59,5 +59,12 @@ namespace BoatStatusHUD
             }
             return null;
         }
+
+        public static string GetCompassDirection(float degrees)
+        {
+            string[] directions = { "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" };
+            int index = Mathf.RoundToInt(degrees / 22.5f) % 16;
+            return directions[index];
+        }
     }
 }

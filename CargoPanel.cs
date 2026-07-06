@@ -109,7 +109,7 @@ namespace BoatStatusHUD
 
             GUILayout.BeginVertical(subCardStyle);
 
-            DrawHUDLine($"<color={ColorLabel}>Deadweight:</color> <b>{_calculatedDeadweight:F0} lbs</b>", defaultStyle);
+            DrawHUDLine($"<color={ColorLabel}>Deadweight:</color> <b>{_calculatedDeadweight:F0}lbs</b>", defaultStyle);
 
             float maxFreeboard = _activeMaxFreeboard.Value;
             float maxCapacity = _activeMaxCapacity.Value;
@@ -123,7 +123,7 @@ namespace BoatStatusHUD
             if (freeboardMeters <= 0.3f || _currentWaterLevel > 0.7f) colorFreeboard = ColorDanger; 
             else if (freeboardMeters <= 0.6f || _currentWaterLevel > 0.3f) colorFreeboard = "#bd7f2e"; 
 
-            DrawHUDLine($"<color={colorFreeboard}>Freeboard:</color> <b>{freeboardMeters:F1} m</b>", defaultStyle);
+            DrawHUDLine($"<color={colorFreeboard}>Freeboard:</color> <b>{freeboardMeters:F1}m</b>", defaultStyle);
 
             float capacityPercentage = _calculatedDeadweight / maxCapacity;
             string burdenText;

@@ -1,5 +1,4 @@
 using BepInEx.Configuration;
-using System.Linq;
 using UnityEngine;
 
 namespace BoatStatusHUD
@@ -12,7 +11,6 @@ namespace BoatStatusHUD
         private bool _hasChipLog = false;
         private bool _hasCompass = false;
         private float _nextCheckTime = 0f;
-        private bool _first = true;
 
         public override void BindConfig(ConfigFile config)
         {
@@ -26,9 +24,8 @@ namespace BoatStatusHUD
         {
             if (!IsEnabled.Value || currentBoat == null) return;
 
-            if (Time.time >= _nextCheckTime || _first)
+            if (Time.time >= _nextCheckTime)
             {
-                _first = false;
                 _nextCheckTime = Time.time + 1f;
 
                 _hasChipLog = !_requireChipLog.Value;
@@ -53,6 +50,7 @@ namespace BoatStatusHUD
         {
             foreach (var t in transforms)
             {
+                if (t == null) continue;
                 string nameLower = t.name.ToLower();
 
                 if (_requireCompass.Value && (nameLower.Contains("compass") || nameLower.Contains("bussola")))
@@ -83,7 +81,7 @@ namespace BoatStatusHUD
 
             GUILayout.BeginVertical(subCardStyle);
 
-            // 1. Vessel Speed (Frame-to-Frame)
+            // 1. Vessel Speed
             if (_hasChipLog)
             {
                 Vector3 rawVelocity = boatRigidbody.velocity;
@@ -91,43 +89,40 @@ namespace BoatStatusHUD
                 float speedInKnots = forwardSpeed * 1.94384f;
                 if (Mathf.Abs(speedInKnots) < 0.1f) speedInKnots = 0f;
 
-                DrawHUDLine($"<color={ColorLabel}>Speed: <b>{speedInKnots:F1} kts</b></color>", defaultStyle);
+                DrawHUDLine($"<color={ColorLabel}>Speed: </color>{speedInKnots:F1}kts", defaultStyle);
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Speed: [Requires Chip Log]</color>", defaultStyle);
+                DrawHUDLine($"<color={ColorMuted}>Speed:</color>[Requires Chip Log]", defaultStyle);
             }
 
-            // 2. Heading (Frame-to-Frame)
+            // 2. Heading with Integrated Compass Point
             if (_hasCompass)
             {
                 float headingDegrees = currentBoat.transform.eulerAngles.y;
                 if (headingDegrees < 0) headingDegrees += 360f;
 
-                DrawHUDLine($"<color={ColorLabel}>Heading: <b>{headingDegrees:F0}°</b></color>", defaultStyle);
+                string directionLetter = Utils.GetCompassDirection(headingDegrees);
+                DrawHUDLine($"<color={ColorLabel}>Heading:</color>{headingDegrees:F0}° {directionLetter}", defaultStyle);
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Heading: [Requires Compass]</color>", defaultStyle);
+                DrawHUDLine($"<color={ColorMuted}>Heading:</color>[Requires Compass]", defaultStyle);
             }
 
+            // 3. Heel Angle
             float heelAngle = Vector3.Angle(currentBoat.transform.up, Vector3.up);
-
             float localZ = currentBoat.transform.localEulerAngles.z;
             if (localZ > 180f) localZ -= 360f;
 
             string sideIndicator = "";
             if (heelAngle > 0.5f)
             {
-                // Se Z for positivo, o barco está inclinado para Bombordo (Port)
-                // Se Z for negativo, o barco está inclinado para Estibordo (Starboard)
                 sideIndicator = localZ > 0f ? "P" : "S";
             }
 
-            // Se passar do limite de segurança do barco, o texto fica vermelho
-            string colorHeel = (heelAngle > currentBoat.safeAngleLimit) ? ColorDanger : ColorLabel;
-
-            DrawHUDLine($"<color={ColorLabel}>Heel Angle:</color> <color={colorHeel}><b>{heelAngle:F1}°{sideIndicator}</b> / {currentBoat.safeAngleLimit:F0}°</color>", defaultStyle);
+            string labelColor = (heelAngle > currentBoat.safeAngleLimit) ? ColorDanger : ColorLabel;
+            DrawHUDLine($"<color={labelColor}>Heel Angle:</color>{heelAngle:F1}° {sideIndicator} / {currentBoat.safeAngleLimit:F0}°", defaultStyle);
 
             GUILayout.EndVertical();
         }

@@ -66,7 +66,7 @@ namespace BoatStatusHUD
             GUILayout.BeginArea(new Rect(20, 20, 200, Screen.height));
 
             GUIStyle mainContainerStyle = new GUIStyle(GUI.skin.box);
-            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.80f));
+            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.85f));
             mainContainerStyle.padding = new RectOffset(10, 10, 10, 10);
 
             mainContainerStyle.stretchWidth = false;

@@ -89,18 +89,16 @@ namespace BoatStatusHUD
             float angle = Mathf.Atan2(wind.x, wind.z) * Mathf.Rad2Deg;
             if (angle < 0) angle += 360f;
 
-            string[] directions = { "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW" };
-            int index = Mathf.RoundToInt(angle / 22.5f) % 16;
-            string directionStr = directions[index];
+            string directionStr = Utils.GetCompassDirection(angle);//directions[index];
 
-            string strengthStr = "Breeze";
+            string strengthStr;
             if (speed < 2f) strengthStr = "Light Air";
             else if (speed < 5f) strengthStr = "Breeze";
             else if (speed < 10f) strengthStr = "Fresh Breeze";
             else if (speed < 18f) strengthStr = "Strong Wind";
             else strengthStr = "Gale";
 
-            return $"{directionStr}{strengthStr}";
+            return $"{speed} {directionStr} {strengthStr}";
         }
 
         private void UpdateWeatherConditions()
