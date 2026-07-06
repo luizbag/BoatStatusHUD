@@ -34,6 +34,7 @@ namespace BoatStatusHUD
                     new CargoPanel(),
                     new SoundingPanel(),
                     new StatusPanel(),
+                    new WeatherPanel()
                 };
 
                 Info.Metadata.GetType().GetProperty("Version")?.SetValue(Info.Metadata, new System.Version(PluginInfo.Version));
@@ -58,7 +59,7 @@ namespace BoatStatusHUD
 
         private void OnGUI()
         {
-            if (!_hudVisible.Value || !GameState.playing || GameState.lastBoat == null) return;
+            if (!_hudVisible.Value || !GameState.playing || GameState.justStarted || GameState.lastBoat == null) return;
 
             BoatDamage activeBoat = GameState.lastBoat.GetComponent<BoatDamage>();
 
