@@ -1,6 +1,6 @@
 {
     "name": "BoatStatusHUD",
-    "version_number": "1.7.0",
+    "version_number": "1.8.0",
     "website_url": "",
     "description": "Real-time vessel telemetry and instrumentation overlay for Sailwind.",
     "dependencies": [

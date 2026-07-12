@@ -63,10 +63,56 @@ namespace BoatStatusHUD
 
             BoatDamage activeBoat = GameState.lastBoat.GetComponent<BoatDamage>();
 
+            GUIStyle mainContainerStyle = new GUIStyle(GUI.skin.box);
+            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.25f));
+            mainContainerStyle.padding = new RectOffset(10, 10, 10, 10);
+
+            /* ALLOW EXPANSION: Let the main container track sub-panels growth */
+            mainContainerStyle.stretchWidth = true;
+            mainContainerStyle.stretchHeight = true;
+
+            /* Enforce global font configurations setup by HUDPanel overrides */
+            GUIStyle baseStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = HUDPanel.FontSize,
+                richText = true,
+                wordWrap = false,
+                clipping = TextClipping.Overflow
+            };
+
+            /* FIX: We anchor the layout at (20, 20) using a horizontal block instead of a rigid Area width */
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20f); // Margin left
+
+            GUILayout.BeginVertical();
+            GUILayout.Space(20f); // Margin top
+
+            /* The vertical layout now wraps the style and auto-expands perfectly to the right and bottom */
+            GUILayout.BeginVertical(mainContainerStyle, GUILayout.MinWidth(200f), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+
+            foreach (var panel in _panels)
+            {
+                panel.DrawLines(baseStyle, activeBoat);
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndVertical();
+
+            /* Closes the master horizontal anchor alignment */
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+/*
+        private void OnGUI()
+        {
+            if (!_hudVisible.Value || !GameState.playing || GameState.justStarted || GameState.lastBoat == null) return;
+
+            BoatDamage activeBoat = GameState.lastBoat.GetComponent<BoatDamage>();
+
             GUILayout.BeginArea(new Rect(20, 20, 200, Screen.height));
 
             GUIStyle mainContainerStyle = new GUIStyle(GUI.skin.box);
-            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.85f));
+            mainContainerStyle.normal.background = Utils.MakeTexture(2, 2, new Color(0.29f, 0.35f, 0.41f, 0.25f));
             mainContainerStyle.padding = new RectOffset(10, 10, 10, 10);
 
             mainContainerStyle.stretchWidth = false;
@@ -90,7 +136,7 @@ namespace BoatStatusHUD
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
-
+*/
         private void Update()
         {
             if (!GameState.playing || GameState.justStarted) return;

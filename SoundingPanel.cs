@@ -50,31 +50,24 @@ namespace BoatStatusHUD
         {
             if (!IsEnabled.Value || currentBoat == null) return;
 
-            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
-            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
-            subCardStyle.margin = new RectOffset(0, 0, 0, 8);
-            subCardStyle.padding = new RectOffset(12, 12, 12, 12);
-            subCardStyle.stretchWidth = false;
-            subCardStyle.stretchHeight = false;
-
-            GUILayout.BeginVertical(subCardStyle);
+            BeginPanel();
 
             DrawHUDLine($"<color={ColorLabel}>Sea Depth: </color>{_seaDepth:F1}m", defaultStyle);
 
             if (_keelClearance <= 0.1f)
             {
-                DrawHUDLine($"<color={ColorDanger}>Keel Clearance: </color><b>{_keelClearance:F1}m</b>", defaultStyle);
+                DrawHUDLine($"<color={ColorDanger}>Keel Clearance: </color>{_keelClearance:F1}m", defaultStyle);
             }
             else if (_keelClearance <= 2.0f)
             {
-                DrawHUDLine($"<color=#bd7f2e>Keel Clearance: </color><b>{_keelClearance:F1}m</b>", defaultStyle);
+                DrawHUDLine($"<color=#bd7f2e>Keel Clearance: </color>{_keelClearance:F1}m", defaultStyle);
             }
             else
             {
                 DrawHUDLine($"<color={ColorLabel}>Keel Clearance: </color>{_keelClearance:F1}m", defaultStyle);
             }
 
-            GUILayout.EndVertical();
+            EndPanel();
         }
     }
 }

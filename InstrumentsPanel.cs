@@ -72,14 +72,7 @@ namespace BoatStatusHUD
             Rigidbody boatRigidbody = currentBoat.GetComponent<Rigidbody>();
             if (boatRigidbody == null) return;
 
-            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
-            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
-            subCardStyle.margin = new RectOffset(0, 0, 0, 8);
-            subCardStyle.padding = new RectOffset(12, 12, 12, 12);
-            subCardStyle.stretchWidth = false;
-            subCardStyle.stretchHeight = false;
-
-            GUILayout.BeginVertical(subCardStyle);
+            BeginPanel();
 
             // 1. Vessel Speed
             if (_hasChipLog)
@@ -93,7 +86,7 @@ namespace BoatStatusHUD
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Speed:</color>[Requires Chip Log]", defaultStyle);
+                DrawHUDLine($"<color={ColorMuted}>Speed: </color>[Requires Chip Log]", defaultStyle);
             }
 
             // 2. Heading with Integrated Compass Point
@@ -103,11 +96,11 @@ namespace BoatStatusHUD
                 if (headingDegrees < 0) headingDegrees += 360f;
 
                 string directionLetter = Utils.GetCompassDirection(headingDegrees);
-                DrawHUDLine($"<color={ColorLabel}>Heading:</color>{headingDegrees:F0}° {directionLetter}", defaultStyle);
+                DrawHUDLine($"<color={ColorLabel}>Heading: </color>{headingDegrees:F0}° {directionLetter}", defaultStyle);
             }
             else
             {
-                DrawHUDLine($"<color={ColorMuted}>Heading:</color>[Requires Compass]", defaultStyle);
+                DrawHUDLine($"<color={ColorMuted}>Heading: </color>[Requires Compass]", defaultStyle);
             }
 
             // 3. Heel Angle
@@ -122,9 +115,9 @@ namespace BoatStatusHUD
             }
 
             string labelColor = (heelAngle > currentBoat.safeAngleLimit) ? ColorDanger : ColorLabel;
-            DrawHUDLine($"<color={labelColor}>Heel Angle:</color>{heelAngle:F1}° {sideIndicator} / {currentBoat.safeAngleLimit:F0}°", defaultStyle);
+            DrawHUDLine($"<color={labelColor}>Heel Angle: </color>{heelAngle:F1}° {sideIndicator}/{currentBoat.safeAngleLimit:F0}°", defaultStyle);
 
-            GUILayout.EndVertical();
+            EndPanel();
         }
     }
 }

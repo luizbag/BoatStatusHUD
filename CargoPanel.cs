@@ -100,16 +100,9 @@ namespace BoatStatusHUD
         {
             if (!IsEnabled.Value || currentBoat == null || _activeMaxCapacity == null) return;
 
-            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
-            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor); 
-            subCardStyle.margin = new RectOffset(0, 0, 0, 8);      
-            subCardStyle.padding = new RectOffset(12, 12, 12, 12);  
-            subCardStyle.stretchWidth = false;
-            subCardStyle.stretchHeight = false;
+            BeginPanel();
 
-            GUILayout.BeginVertical(subCardStyle);
-
-            DrawHUDLine($"<color={ColorLabel}>Deadweight:</color> <b>{_calculatedDeadweight:F0}lbs</b>", defaultStyle);
+            DrawHUDLine($"<color={ColorLabel}>Deadweight:</color> {_calculatedDeadweight:F0}lbs", defaultStyle);
 
             float maxFreeboard = _activeMaxFreeboard.Value;
             float maxCapacity = _activeMaxCapacity.Value;
@@ -123,7 +116,7 @@ namespace BoatStatusHUD
             if (freeboardMeters <= 0.3f || _currentWaterLevel > 0.7f) colorFreeboard = ColorDanger; 
             else if (freeboardMeters <= 0.6f || _currentWaterLevel > 0.3f) colorFreeboard = "#bd7f2e"; 
 
-            DrawHUDLine($"<color={colorFreeboard}>Freeboard:</color> <b>{freeboardMeters:F1}m</b>", defaultStyle);
+            DrawHUDLine($"<color={colorFreeboard}>Freeboard:</color> {freeboardMeters:F1}m", defaultStyle);
 
             float capacityPercentage = _calculatedDeadweight / maxCapacity;
             string burdenText;
@@ -150,9 +143,9 @@ namespace BoatStatusHUD
                 colorBurden = ColorMuted;
             }
 
-            DrawHUDLine($"<color={ColorLabel}>Burden:</color> <b><color={colorBurden}>{burdenText}</color></b>", defaultStyle);
+            DrawHUDLine($"<color={ColorLabel}>Burden:</color> <color={colorBurden}>{burdenText}</color>", defaultStyle);
 
-            GUILayout.EndVertical();
+            EndPanel();
         }
     }
 }

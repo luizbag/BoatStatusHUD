@@ -98,7 +98,7 @@ namespace BoatStatusHUD
             else if (speed < 18f) strengthStr = "Strong Wind";
             else strengthStr = "Gale";
 
-            return $"{speed} {directionStr} {strengthStr}";
+            return $"{directionStr} {strengthStr}";
         }
 
         private void UpdateWeatherConditions()
@@ -132,14 +132,7 @@ namespace BoatStatusHUD
         {
             if (!IsEnabled.Value || currentBoat == null) return;
 
-            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
-            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
-            subCardStyle.margin = new RectOffset(0, 0, 0, 8);
-            subCardStyle.padding = new RectOffset(12, 12, 12, 12);
-            subCardStyle.stretchWidth = false;
-            subCardStyle.stretchHeight = false;
-
-            GUILayout.BeginVertical(subCardStyle);
+            BeginPanel();
 
             if (_hasWindIndicator)
             {
@@ -152,7 +145,7 @@ namespace BoatStatusHUD
 
             DrawHUDLine($"<color={ColorLabel}>Conditions: </color><color={_conditionsColor}>{_conditionsString}</color>", defaultStyle);
 
-            GUILayout.EndVertical();
+            EndPanel();
         }
     }
 }

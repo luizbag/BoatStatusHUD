@@ -37,14 +37,7 @@ namespace BoatStatusHUD
         {
             if (!IsEnabled.Value || currentBoat == null) return;
 
-            GUIStyle subCardStyle = new GUIStyle(GUI.skin.box);
-            subCardStyle.normal.background = Utils.MakeTexture(2, 2, BackgroundColor);
-            subCardStyle.margin = new RectOffset(0, 0, 0, 8);
-            subCardStyle.padding = new RectOffset(12, 12, 12, 12);
-            subCardStyle.stretchWidth = false;
-            subCardStyle.stretchHeight = false;
-
-            GUILayout.BeginVertical(subCardStyle);
+            BeginPanel();
 
             /* Hull Integrity Line with conditional styling for the label */
             string hullLabelColor = ColorLabel;
@@ -60,7 +53,7 @@ namespace BoatStatusHUD
 
             DrawHUDLine($"<color={bilgeLabelColor}>Bilge Water: </color>{_bilgeWaterPercent:F1}%", defaultStyle);
 
-            GUILayout.EndVertical();
+            EndPanel();
         }
     }
 }
